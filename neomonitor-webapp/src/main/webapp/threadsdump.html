@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<link href="css/metro-bootstrap.css" rel="stylesheet">
+<link href="css/metro-bootstrap-responsive.css" rel="stylesheet">
+<link href="css/iconFont.css" rel="stylesheet">
+<link href="css/docs.css" rel="stylesheet">
+<link href="js/prettify/prettify.css" rel="stylesheet">
+
+<!-- Load JavaScript Libraries -->
+<!-- script src="js/jquery/jquery.min.js"></script -->
+<script src="js/jquery-1.11.1.min.js"></script>
+<script src="js/jquery/jquery.widget.min.js"></script>
+<script src="js/jquery/jquery.mousewheel.js"></script>
+<script src="js/prettify/prettify.js"></script>
+
+
+<script src="js/load-metro.js"></script>
+<script src="js/util.js"></script>
+
+<!--[if lte IE 8]>
+<script src="js/excanvas.js"></script>
+<![endif]-->
+<script>
+	var procId;
+
+	$(function() {
+
+		procId = getUrlParam('procid');
+		dumpThread(procId);
+	});
+
+	function dumpThread(procId) {
+		$
+				.ajax({
+					type : "GET",
+					url : "mon/processes/threads/dump/" + procId,
+					cache:false,
+					contentType : "application/json",
+					dataType : 'json',
+					success : function(data) {
+						$.each(data,function(i) {
+								var st = "";
+								$.each(data[i].stackTrace,function(j) {st += "<li><a href='#'>"+ data[i].stackTrace[j]	+ "</a></li>";});
+								var threadItem = "<li class='node collapsed'><a href='#'><span class='node-toggle'></span>"
+											+ data[i].threadName
+											+ "</a><ul>"
+											+ st
+											+ "</ul></li>";
+								$("#threads").append(threadItem);
+								
+								console.log($("#threads").html());	
+								
+						});
+
+					}
+				});
+	}
+</script>
+
+<title>ThreadsDump</title>
+</head>
+<body class="metro">
+
+	<div class="container">
+		<h1>
+			<a href="javascript:history.go(-1);"><i
+				class="icon-arrow-left-3 fg-darker smaller"></i></a> NeoMonitor 2.0<small
+				class="on-right">Threads&nbsp;Dump</small>
+		</h1>
+		<hr />
+		<div id="threadsdump">
+			<ul class="treeview" data-role="treeview" id="threads">
+			</ul>
+
+		</div>
+
+	</div>
+
+</body>
+</html>

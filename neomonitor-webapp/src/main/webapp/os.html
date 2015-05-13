@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<link href="css/metro-bootstrap.css" rel="stylesheet">
+<link href="css/metro-bootstrap-responsive.css" rel="stylesheet">
+<link href="css/iconFont.css" rel="stylesheet">
+<link href="css/docs.css" rel="stylesheet">
+<link href="js/prettify/prettify.css" rel="stylesheet">
+
+<!-- Load JavaScript Libraries -->
+<!-- script src="js/jquery/jquery.min.js"></script -->
+<script src="js/jquery-1.11.1.min.js"></script>
+<script src="js/jquery/jquery.widget.min.js"></script>
+<script src="js/jquery/jquery.mousewheel.js"></script>
+<script src="js/prettify/prettify.js"></script>
+
+
+<script src="js/load-metro.js"></script>
+<script src="js/util.js"></script>
+<script src="js/chart/Chart.min.js"></script>
+<!--[if lte IE 8]>
+<script src="js/excanvas.js"></script>
+<![endif]-->
+<script>
+	var procId;
+	var cpuLabel = new Array();
+	var cpuData = new Array();
+	
+	
+	$(function() {
+
+		procId = getUrlParam('procid');
+		getOsInfo(procId);
+		getCPUHisInfo(procId);
+	});
+
+	function getOsInfo(procId) {
+		$.ajax({
+			type : "GET",
+			url : "mon/processes/os/" + procId,
+			cache:false,
+			contentType : "application/json",
+			dataType : 'json',
+			success : function(data) {
+				$("#osinfo").append(
+						"<p>系统平均负载:"
+								+ data.SystemLoadAverage + "</p>"								
+								+ "<p>CPU使用时长:"
+								+ (data.ProcessCpuTime/1000/1000/1000).toFixed(2) + "s</p>"
+								+ "<p>交换空间总大小:"
+								+ (data.TotalSwapSpaceSize/1024/1024).toFixed(2) + "M</p>"
+								+ "<p>交换空间空闲大小:"
+								+ (data.FreeSwapSpaceSize/1024/1024).toFixed(2) + "M</p>"
+								+ "<p>物理空间总大小:"
+								+ (data.TotalPhysicalMemorySize/1024/1024).toFixed(2) + "M</p>"
+								+ "<p>物理空间空闲大小:"
+								+ (data.FreePhysicalMemorySize/1024/1024).toFixed(2) + "M</p>"
+
+
+				);
+				
+			}
+		});
+	}
+	
+	
+
+	function getCPUHisInfo(procId) {
+		$.ajax({
+			type : "GET",
+			url : "mon/processes/cpuhis/" + procId,
+			cache:false,
+			contentType : "application/json",
+			dataType : 'json',
+			success : function(data) {
+				$.each(data,function(i) {
+					if(data[i].cpuTime!=null){
+						cpuLabel.push(data[i].monTime.substr(8, 2)+":"+data[i].monTime.substr(10, 2));
+						cpuData.push(data[i].cpuTime);
+					}
+					
+				});
+				
+				var lineChartData = {
+					labels : cpuLabel,
+					datasets : [
+							
+							{
+								label : "CPU",
+								fillColor : "rgba(151,187,205,0.2)",
+								strokeColor : "rgba(151,187,205,1)",
+								pointColor : "rgba(151,187,205,1)",
+								pointStrokeColor : "#fff",
+								pointHighlightFill : "#fff",
+								pointHighlightStroke : "rgba(151,187,205,1)",
+								data : cpuData
+							} ]
+
+				}
+				var ctx = document.getElementById("cpuchart").getContext("2d");
+				window.myLine = new Chart(ctx).Line(lineChartData, {
+					responsive : true
+				});
+
+			}
+		});
+	}
+</script>
+
+<title>Process</title>
+</head>
+<body class="metro">
+
+	<div class="container">
+		<h1>
+			<a href="javascript:history.go(-1);"><i
+				class="icon-arrow-left-3 fg-darker smaller"></i></a> NeoMonitor 2.0<small
+				class="on-right">OS Info</small>
+		</h1>
+
+		<div class="grid fluid">
+			<div class="row">
+				<div class="span7">
+
+					<div class="panel">
+						<div class="panel-header  bg-lightBlue fg-white">系统信息</div>
+						<div class="panel-content" id="osinfo">
+						
+						</div>
+
+					</div>
+				</div>
+				
+			</div>
+
+		</div>
+		<div>
+			<div style="height: 150px">
+				<canvas id="cpuchart" height="100px" width="350px"></canvas>
+			</div>
+		</div>
+	</div>
+	<script>
+		
+	</script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:component-scan base-package="org.neolm.neomonitor.agent.service" />
+	
+	<bean id="configBean"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location">
+			<value>classpath:neoagent.server.properties</value>
+		</property>
+	</bean>
+	<bean id="selfExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
+		<property name="service" ref="agentSelfImpl" />
+		<!-- 定义服务名 -->
+		<property name="serviceName" value="agentself" />
+		<property name="serviceInterface"
+			value="org.neolm.neomonitor.agent.service.IAgentSelf" />
+		<property name="registryPort"  >
+			<value>${neoagent.port}</value>
+		</property>
+	</bean>
+	
+	<bean id="javaprocExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
+		<property name="service" ref="javaProcessImpl" />
+		<!-- 定义服务名 -->
+		<property name="serviceName" value="javaproc" />
+		<property name="serviceInterface"
+			value="org.neolm.neomonitor.agent.service.IJavaProcess" />
+		<property name="registryPort"  >
+			<value>${neoagent.port}</value>
+		</property>
+	</bean>
+	
+	<bean id="localvmExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
+		<property name="service" ref="localVMImpl" />
+		<!-- 定义服务名 -->
+		<property name="serviceName" value="localvm" />
+		<property name="serviceInterface"
+			value="org.neolm.neomonitor.agent.service.ILocalVM" />
+		<property name="registryPort"  >
+			<value>${neoagent.port}</value>
+		</property>
+	</bean>
+	
+	
+</beans>

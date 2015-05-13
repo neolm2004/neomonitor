@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<link href="css/metro-bootstrap.css" rel="stylesheet">
+<link href="css/metro-bootstrap-responsive.css" rel="stylesheet">
+<link href="css/iconFont.css" rel="stylesheet">
+<link href="css/docs.css" rel="stylesheet">
+<link href="js/prettify/prettify.css" rel="stylesheet">
+
+<!-- Load JavaScript Libraries -->
+<!-- script src="js/jquery/jquery.min.js"></script -->
+<script src="js/jquery-1.11.1.min.js"></script>
+<script src="js/jquery/jquery.widget.min.js"></script>
+<script src="js/jquery/jquery.mousewheel.js"></script>
+<script src="js/prettify/prettify.js"></script>
+
+
+<script src="js/load-metro.js"></script>
+<script src="js/util.js"></script>
+<script src="js/chart/Chart.min.js"></script>
+<!--[if lte IE 8]>
+<script src="js/excanvas.js"></script>
+<![endif]-->
+<script>
+	var procId;
+	var heapLabel = new Array();
+	var heapData = new Array();
+	var nonheapData = new Array();
+	
+	
+	$(function() {
+
+		procId = getUrlParam('procid');
+		getMemoryInfo(procId);
+		getMemoryHisInfo(procId);
+	});
+
+	function getMemoryInfo(procId) {
+		$.ajax({
+			type : "GET",
+			url : "mon/processes/memory/" + procId,
+			contentType : "application/json",
+			dataType : 'json',
+			success : function(data) {
+				$("#nonheap").append(
+						"<p>非堆使用大小:"
+								+ (data.NonHeapMemoryUsage.used / 1024 / 1024)
+										.toFixed(2)
+								+ "M</p>"
+								+ "<p>非堆总大小:"
+								+ (data.NonHeapMemoryUsage.max / 1024 / 1024)
+										.toFixed(2) + "M</p>"
+
+				);
+				$("#heap").append(
+
+						"<p>堆使用大小:"
+								+ (data.HeapMemoryUsage.used / 1024 / 1024)
+										.toFixed(2)
+								+ "M</p>"
+								+ "<p>堆总大小:"
+								+ (data.HeapMemoryUsage.max / 1024 / 1024)
+										.toFixed(2) + "M</p>");
+
+				
+				
+
+			}
+		});
+	}
+	
+	
+
+	function getMemoryHisInfo(procId) {
+		$.ajax({
+			type : "GET",
+			url : "mon/processes/memoryhis/" + procId,
+			cache:false,
+			contentType : "application/json",
+			dataType : 'json',
+			success : function(data) {
+				$.each(data,function(i) {
+					if(data[i].HeapMemoryUsage!=null){
+						heapLabel.push(data[i].monTime.substr(8, 2)+":"+data[i].monTime.substr(10, 2));
+						heapData.push(data[i].HeapMemoryUsage.used/1024/1024);
+					}else{
+						nonheapData.push(data[i].NonHeapMemoryUsage.used/1024/1024);
+					}
+					
+					
+				});
+				
+
+				var lineChartData = {
+					labels : heapLabel,
+					datasets : [
+							{
+								label : "heap memory",
+								fillColor : "rgba(220,220,220,0.2)",
+								strokeColor : "rgba(220,220,220,1)",
+								pointColor : "rgba(220,220,220,1)",
+								pointStrokeColor : "#fff",
+								pointHighlightFill : "#fff",
+								pointHighlightStroke : "rgba(220,220,220,1)",
+								data :nonheapData 
+							},
+							{
+								label : "Non heap memory",
+								fillColor : "rgba(151,187,205,0.2)",
+								strokeColor : "rgba(151,187,205,1)",
+								pointColor : "rgba(151,187,205,1)",
+								pointStrokeColor : "#fff",
+								pointHighlightFill : "#fff",
+								pointHighlightStroke : "rgba(151,187,205,1)",
+								data : heapData
+							} ]
+
+				}
+				
+				var ctx = document.getElementById("memchart").getContext("2d");
+				window.myLine = new Chart(ctx).Line(lineChartData, {
+					responsive : true
+				});
+
+			}
+		});
+	}
+</script>
+
+<title>Process</title>
+</head>
+<body class="metro">
+
+	<div class="container">
+		<h1>
+			<a href="javascript:history.go(-1);"><i
+				class="icon-arrow-left-3 fg-darker smaller"></i></a> NeoMonitor 2.0<small
+				class="on-right">Memory</small>
+		</h1>
+
+		<div class="grid fluid">
+			<div class="row">
+				<div class="span5">
+
+					<div class="panel">
+						<div class="panel-header  bg-lightBlue fg-white">堆内存</div>
+						<div class="panel-content" id="nonheap"></div>
+
+					</div>
+				</div>
+				<div class="span5">
+					<div class="panel">
+						<div class="panel-header  bg-lightBlue fg-white">非堆内存</div>
+						<div class="panel-content" id="heap"></div>
+
+					</div>
+
+				</div>
+			</div>
+
+		</div>
+		<div>
+			<div style="height: 150px">
+				<canvas id="memchart" height="100px" width="350px"></canvas>
+			</div>
+		</div>
+	</div>
+	<script>
+		
+	</script>
+</body>
+</html>
