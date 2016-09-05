@@ -17,7 +17,7 @@
 	<url>http://maven.apache.org</url>
 
 	<properties>
-		<project.build.sourceEncoding>GBK</project.build.sourceEncoding>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 	</properties>
 
@@ -44,6 +44,7 @@
 			<artifactId>commons-lang</artifactId>
 			<version>2.6</version>
 		</dependency>
+		<!-- 
 		<dependency>
 			<groupId>com.tibco.hawk</groupId>
 			<artifactId>console</artifactId>
@@ -63,7 +64,7 @@
 			<groupId>com.tibco.hawk</groupId>
 			<artifactId>util</artifactId>
 			<version>5.1</version>
-		</dependency>
+		</dependency> -->
 		<!-- dependency>
 			<groupId>ojdbc</groupId>
 			<artifactId>ojdbc</artifactId>
@@ -71,6 +72,7 @@
 			<scope>system</scope>
 			<systemPath>F:/project/lib/ojdbc6-11.2.0.2.0.jar</systemPath>
 		</dependency -->
+		
 		<dependency>
 			<groupId>org.jboss.remoting</groupId>
 			<artifactId>jboss-remoting</artifactId>
