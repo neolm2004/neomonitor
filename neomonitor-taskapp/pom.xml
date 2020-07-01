@@ -18,7 +18,7 @@
 
   <properties>
     <project.build.sourceEncoding>GBK</project.build.sourceEncoding>
-    <org.quartz-scheduler.version>2.2.1</org.quartz-scheduler.version>
+    <org.quartz-scheduler.version>2.3.2</org.quartz-scheduler.version>
   </properties>
 
   <dependencies>
